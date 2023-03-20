@@ -1,0 +1,158 @@
+diff --context --recursive --ignore-blank-lines mailcow/web/admin.php mailcow-2023-01_patch_3/web/admin.php
+*** mailcow/web/admin.php	Mon Mar 20 04:56:36 2023
+--- mailcow-2023-01_patch_3/web/admin.php	Mon Mar 20 04:47:44 2023
+***************
+*** 76,82 ****
+  foreach ($RSPAMD_MAPS['regex'] as $rspamd_regex_desc => $rspamd_regex_map) {
+    $rspamd_regex_maps[$rspamd_regex_desc] = [
+      'map' => $rspamd_regex_map,
+!     'data' => file_get_contents('/rspamd_custom_maps/' . $rspamd_regex_map)
+    ];
+  }
+  
+--- 76,82 ----
+  foreach ($RSPAMD_MAPS['regex'] as $rspamd_regex_desc => $rspamd_regex_map) {
+    $rspamd_regex_maps[$rspamd_regex_desc] = [
+      'map' => $rspamd_regex_map,
+!     'data' => file_get_contents($_SERVER['DOCUMENT_ROOT'] . '/rspamd_custom_maps/' . $rspamd_regex_map)
+    ];
+  }
+  
+diff --context --recursive --ignore-blank-lines mailcow/web/inc/functions.mailbox.inc.php mailcow-2023-01_patch_3/web/inc/functions.mailbox.inc.php
+*** mailcow/web/inc/functions.mailbox.inc.php	Mon Mar 20 04:56:27 2023
+--- mailcow-2023-01_patch_3/web/inc/functions.mailbox.inc.php	Mon Mar 20 04:54:11 2023
+***************
+*** 107,114 ****
+            }
+            if ($filter_type == 'prefilter') {
+              try {
+!               if (file_exists('/global_sieve/before')) {
+!                 $filter_handle = fopen('/global_sieve/before', 'w');
+                  if (!$filter_handle) {
+                    throw new Exception($lang['danger']['file_open_error']);
+                  }
+--- 107,114 ----
+            }
+            if ($filter_type == 'prefilter') {
+              try {
+!               if (file_exists($_SERVER['DOCUMENT_ROOT'] . '/global_sieve/before')) {
+!                 $filter_handle = fopen($_SERVER['DOCUMENT_ROOT'] . '/global_sieve/before', 'w');
+                  if (!$filter_handle) {
+                    throw new Exception($lang['danger']['file_open_error']);
+                  }
+***************
+*** 142,149 ****
+            }
+            elseif ($filter_type == 'postfilter') {
+              try {
+!               if (file_exists('/global_sieve/after')) {
+!                 $filter_handle = fopen('/global_sieve/after', 'w');
+                  if (!$filter_handle) {
+                    throw new Exception($lang['danger']['file_open_error']);
+                  }
+--- 142,149 ----
+            }
+            elseif ($filter_type == 'postfilter') {
+              try {
+!               if (file_exists($_SERVER['DOCUMENT_ROOT'] . '/global_sieve/after')) {
+!                 $filter_handle = fopen($_SERVER['DOCUMENT_ROOT'] . '/global_sieve/after', 'w');
+                  if (!$filter_handle) {
+                    throw new Exception($lang['danger']['file_open_error']);
+                  }
+***************
+*** 3573,3580 ****
+            if ($_SESSION['mailcow_cc_role'] != "admin") {
+              return false;
+            }
+!           $global_filters['prefilter'] = file_get_contents('/global_sieve/before');
+!           $global_filters['postfilter'] = file_get_contents('/global_sieve/after');
+            return $global_filters;
+          break;
+          case 'filter_details':
+--- 3573,3580 ----
+            if ($_SESSION['mailcow_cc_role'] != "admin") {
+              return false;
+            }
+!           $global_filters['prefilter'] = file_get_contents($_SERVER['DOCUMENT_ROOT'] . '/global_sieve/before');
+!           $global_filters['postfilter'] = file_get_contents($_SERVER['DOCUMENT_ROOT'] . '/global_sieve/after');
+            return $global_filters;
+          break;
+          case 'filter_details':
+diff --context --recursive --ignore-blank-lines mailcow/web/inc/functions.quarantine.inc.php mailcow-2023-01_patch_3/web/inc/functions.quarantine.inc.php
+*** mailcow/web/inc/functions.quarantine.inc.php	Wed Mar 15 14:42:14 2023
+--- mailcow-2023-01_patch_3/web/inc/functions.quarantine.inc.php	Mon Mar 20 04:55:05 2023
+***************
+*** 789,795 ****
+          $settings['redirect'] = $redis->Get('Q_REDIRECT');
+          $settings['html_tmpl'] = htmlspecialchars($redis->Get('Q_HTML'));
+          if (empty($settings['html_tmpl'])) {
+!           $settings['html_tmpl'] = htmlspecialchars(file_get_contents("/tpls/quarantine.tpl"));
+          }
+        }
+        catch (RedisException $e) {
+--- 789,795 ----
+          $settings['redirect'] = $redis->Get('Q_REDIRECT');
+          $settings['html_tmpl'] = htmlspecialchars($redis->Get('Q_HTML'));
+          if (empty($settings['html_tmpl'])) {
+!           $settings['html_tmpl'] = htmlspecialchars(file_get_contents($_SERVER['DOCUMENT_ROOT'] . "/tpls/quarantine.tpl"));
+          }
+        }
+        catch (RedisException $e) {
+diff --context --recursive --ignore-blank-lines mailcow/web/inc/functions.quota_notification.inc.php mailcow-2023-01_patch_3/web/inc/functions.quota_notification.inc.php
+*** mailcow/web/inc/functions.quota_notification.inc.php	Wed Mar 15 14:42:14 2023
+--- mailcow-2023-01_patch_3/web/inc/functions.quota_notification.inc.php	Mon Mar 20 04:55:38 2023
+***************
+*** 50,56 ****
+          $settings['sender'] = $redis->Get('QW_SENDER');
+          $settings['html_tmpl'] = htmlspecialchars($redis->Get('QW_HTML'));
+          if (empty($settings['html_tmpl'])) {
+!           $settings['html_tmpl'] = htmlspecialchars(file_get_contents("/tpls/quota.tpl"));
+          }
+        }
+        catch (RedisException $e) {
+--- 50,56 ----
+          $settings['sender'] = $redis->Get('QW_SENDER');
+          $settings['html_tmpl'] = htmlspecialchars($redis->Get('QW_HTML'));
+          if (empty($settings['html_tmpl'])) {
+!           $settings['html_tmpl'] = htmlspecialchars(file_get_contents($_SERVER['DOCUMENT_ROOT'] . "/tpls/quota.tpl"));
+          }
+        }
+        catch (RedisException $e) {
+diff --context --recursive --ignore-blank-lines mailcow/web/inc/functions.rspamd.inc.php mailcow-2023-01_patch_3/web/inc/functions.rspamd.inc.php
+*** mailcow/web/inc/functions.rspamd.inc.php	Wed Mar 15 14:42:14 2023
+--- mailcow-2023-01_patch_3/web/inc/functions.rspamd.inc.php	Mon Mar 20 04:51:58 2023
+***************
+*** 155,170 ****
+            }
+          }
+          try {
+!           if (file_exists('/rspamd_custom_maps/' . $map)) {
+              $map_content = trim($_data['rspamd_map_data']);
+!             $map_handle = fopen('/rspamd_custom_maps/' . $map, 'w');
+              if (!$map_handle) {
+                throw new Exception($lang['danger']['file_open_error']);
+              }
+              fwrite($map_handle, $map_content . PHP_EOL);
+              fclose($map_handle);
+              sleep(1.5);
+!             touch('/rspamd_custom_maps/' . $map);
+            }
+          }
+          catch (Exception $e) {
+--- 155,170 ----
+            }
+          }
+          try {
+!           if (file_exists($_SERVER['DOCUMENT_ROOT'] . '/rspamd_custom_maps/' . $map)) {
+              $map_content = trim($_data['rspamd_map_data']);
+!             $map_handle = fopen($_SERVER['DOCUMENT_ROOT'] . '/rspamd_custom_maps/' . $map, 'w');
+              if (!$map_handle) {
+                throw new Exception($lang['danger']['file_open_error']);
+              }
+              fwrite($map_handle, $map_content . PHP_EOL);
+              fclose($map_handle);
+              sleep(1.5);
+!             touch($_SERVER['DOCUMENT_ROOT'] . '/rspamd_custom_maps/' . $map);
+            }
+          }
+          catch (Exception $e) {

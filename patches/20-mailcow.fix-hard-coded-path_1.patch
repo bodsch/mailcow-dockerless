@@ -1,0 +1,338 @@
+diff --context --recursive --ignore-blank-lines mailcow/web/admin.php mailcow-2023-01_patch_3/web/admin.php
+*** mailcow/web/admin.php	Wed Mar 15 14:42:14 2023
+--- mailcow-2023-01_patch_3/web/admin.php	Mon Mar 20 04:38:32 2023
+***************
+*** 11,19 ****
+  $tfa_data = get_tfa();
+  $fido2_data = fido2(array("action" => "get_friendly_names"));
+  
+! $js_minifier->add('/web/js/site/admin.js');
+! $js_minifier->add('/web/js/presets/rspamd.js');
+! $js_minifier->add('/web/js/site/pwgen.js');
+  
+  // all domains
+  $domains = mailbox('get', 'domains');
+--- 11,19 ----
+  $tfa_data = get_tfa();
+  $fido2_data = fido2(array("action" => "get_friendly_names"));
+  
+! $js_minifier->add('./js/site/admin.js');
+! $js_minifier->add('./js/presets/rspamd.js');
+! $js_minifier->add('./js/site/pwgen.js');
+  
+  // all domains
+  $domains = mailbox('get', 'domains');
+diff --context --recursive --ignore-blank-lines mailcow/web/debug.php mailcow-2023-01_patch_3/web/debug.php
+*** mailcow/web/debug.php	Mon Mar 20 04:36:57 2023
+--- mailcow-2023-01_patch_3/web/debug.php	Mon Mar 20 04:38:32 2023
+***************
+*** 16,22 ****
+    $_SESSION['gal'] = json_decode($license_cache, true);
+  }
+  
+! $js_minifier->add('/web/js/site/debug.js');
+  
+  // vmail df
+  /*
+--- 16,22 ----
+    $_SESSION['gal'] = json_decode($license_cache, true);
+  }
+  
+! $js_minifier->add('./js/site/debug.js');
+  
+  // vmail df
+  /*
+diff --context --recursive --ignore-blank-lines mailcow/web/edit.php mailcow-2023-01_patch_3/web/edit.php
+*** mailcow/web/edit.php	Wed Mar 15 14:42:14 2023
+--- mailcow-2023-01_patch_3/web/edit.php	Mon Mar 20 04:38:32 2023
+***************
+*** 208,215 ****
+    $template_data['access_denied'] = true;
+  }
+  
+! $js_minifier->add('/web/js/site/edit.js');
+! $js_minifier->add('/web/js/site/pwgen.js');
+  
+  $template_data['result'] = $result;
+  $template_data['return_to'] = $_SESSION['return_to'];
+--- 208,215 ----
+    $template_data['access_denied'] = true;
+  }
+  
+! $js_minifier->add('./js/site/edit.js');
+! $js_minifier->add('./js/site/pwgen.js');
+  
+  $template_data['result'] = $result;
+  $template_data['return_to'] = $_SESSION['return_to'];
+diff --context --recursive --ignore-blank-lines mailcow/web/inc/header.inc.php mailcow-2023-01_patch_3/web/inc/header.inc.php
+*** mailcow/web/inc/header.inc.php	Mon Mar 20 04:36:51 2023
+--- mailcow-2023-01_patch_3/web/inc/header.inc.php	Mon Mar 20 04:38:29 2023
+***************
+*** 6,30 ****
+  
+  // CSS
+  if (preg_match("/mailbox/i", $_SERVER['REQUEST_URI'])) {
+!   $css_minifier->add('/web/css/site/mailbox.css');
+  }
+  if (preg_match("/admin/i", $_SERVER['REQUEST_URI'])) {
+!   $css_minifier->add('/web/css/site/admin.css');
+  }
+  if (preg_match("/user/i", $_SERVER['REQUEST_URI'])) {
+!   $css_minifier->add('/web/css/site/user.css');
+  }
+  if (preg_match("/edit/i", $_SERVER['REQUEST_URI'])) {
+!   $css_minifier->add('/web/css/site/edit.css');
+  }
+  if (preg_match("/(quarantine|qhandler)/i", $_SERVER['REQUEST_URI'])) {
+!   $css_minifier->add('/web/css/site/quarantine.css');
+  }
+  if (preg_match("/debug/i", $_SERVER['REQUEST_URI'])) {
+!   $css_minifier->add('/web/css/site/debug.css');
+  }
+  if ($_SERVER['REQUEST_URI'] == '/') {
+!   $css_minifier->add('/web/css/site/index.css');
+  }
+  
+  $hash = $css_minifier->getDataHash();
+--- 6,30 ----
+  
+  // CSS
+  if (preg_match("/mailbox/i", $_SERVER['REQUEST_URI'])) {
+!   $css_minifier->add('./css/site/mailbox.css');
+  }
+  if (preg_match("/admin/i", $_SERVER['REQUEST_URI'])) {
+!   $css_minifier->add('./css/site/admin.css');
+  }
+  if (preg_match("/user/i", $_SERVER['REQUEST_URI'])) {
+!   $css_minifier->add('./css/site/user.css');
+  }
+  if (preg_match("/edit/i", $_SERVER['REQUEST_URI'])) {
+!   $css_minifier->add('./css/site/edit.css');
+  }
+  if (preg_match("/(quarantine|qhandler)/i", $_SERVER['REQUEST_URI'])) {
+!   $css_minifier->add('./css/site/quarantine.css');
+  }
+  if (preg_match("/debug/i", $_SERVER['REQUEST_URI'])) {
+!   $css_minifier->add('./css/site/debug.css');
+  }
+  if ($_SERVER['REQUEST_URI'] == '/') {
+!   $css_minifier->add('./css/site/index.css');
+  }
+  
+  $hash = $css_minifier->getDataHash();
+diff --context --recursive --ignore-blank-lines mailcow/web/inc/init_db.inc.php mailcow-2023-01_patch_3/web/inc/init_db.inc.php
+*** mailcow/web/inc/init_db.inc.php	Mon Mar 20 04:36:51 2023
+--- mailcow-2023-01_patch_3/web/inc/init_db.inc.php	Mon Mar 20 04:38:29 2023
+***************
+*** 1426,1433 ****
+    }
+  }
+  if (php_sapi_name() == "cli") {
+!   include '/web/inc/vars.inc.php';
+!   include '/web/inc/functions.docker.inc.php';
+    // $now = new DateTime();
+    // $mins = $now->getOffset() / 60;
+    // $sgn = ($mins < 0 ? -1 : 1);
+--- 1426,1433 ----
+    }
+  }
+  if (php_sapi_name() == "cli") {
+!   include './inc/vars.inc.php';
+!   include './inc/functions.docker.inc.php';
+    // $now = new DateTime();
+    // $mins = $now->getOffset() / 60;
+    // $sgn = ($mins < 0 ? -1 : 1);
+diff --context --recursive --ignore-blank-lines mailcow/web/inc/prerequisites.inc.php mailcow-2023-01_patch_3/web/inc/prerequisites.inc.php
+*** mailcow/web/inc/prerequisites.inc.php	Mon Mar 20 04:36:57 2023
+--- mailcow-2023-01_patch_3/web/inc/prerequisites.inc.php	Mon Mar 20 04:38:29 2023
+***************
+*** 324,347 ****
+  // Minify JS
+  use MatthiasMullie\Minify;
+  $js_minifier = new JSminifierExtended();
+! $js_dir = array_diff(scandir('/web/js/build'), array('..', '.'));
+  // Minify CSS
+  $css_minifier = new CSSminifierExtended();
+! $css_dir = array_diff(scandir('/web/css/build'), array('..', '.'));
+  // get customized ui data
+  $UI_TEXTS = customize('get', 'ui_texts');
+  
+  
+  // minify bootstrap theme
+! if (file_exists('/web/css/themes/'.$UI_THEME.'-bootstrap.css'))
+!   $css_minifier->add('/web/css/themes/'.$UI_THEME.'-bootstrap.css');
+  else
+!   $css_minifier->add('/web/css/themes/lumen-bootstrap.css');
+  // minify css build files
+  foreach ($css_dir as $css_file) {
+!   $css_minifier->add('/web/css/build/' . $css_file);
+  }
+  // minify js build files
+  foreach ($js_dir as $js_file) {
+!   $js_minifier->add('/web/js/build/' . $js_file);
+  }
+--- 324,347 ----
+  // Minify JS
+  use MatthiasMullie\Minify;
+  $js_minifier = new JSminifierExtended();
+! $js_dir = array_diff(scandir('./js/build'), array('..', '.'));
+  // Minify CSS
+  $css_minifier = new CSSminifierExtended();
+! $css_dir = array_diff(scandir('./css/build'), array('..', '.'));
+  // get customized ui data
+  $UI_TEXTS = customize('get', 'ui_texts');
+  
+  
+  // minify bootstrap theme
+! if (file_exists('./css/themes/'.$UI_THEME.'-bootstrap.css'))
+!   $css_minifier->add('./css/themes/'.$UI_THEME.'-bootstrap.css');
+  else
+!   $css_minifier->add('./css/themes/lumen-bootstrap.css');
+  // minify css build files
+  foreach ($css_dir as $css_file) {
+!   $css_minifier->add('./css/build/' . $css_file);
+  }
+  // minify js build files
+  foreach ($js_dir as $js_file) {
+!   $js_minifier->add('./js/build/' . $js_file);
+  }
+diff --context --recursive --ignore-blank-lines mailcow/web/inc/vars.inc.php mailcow-2023-01_patch_3/web/inc/vars.inc.php
+*** mailcow/web/inc/vars.inc.php	Wed Mar 15 14:42:14 2023
+--- mailcow-2023-01_patch_3/web/inc/vars.inc.php	Mon Mar 20 04:38:29 2023
+***************
+*** 109,115 ****
+  
+  // default theme is lumen
+  // additional themes can be found here: https://bootswatch.com/
+! // copy them to data/web/css/themes/{THEME-NAME}-bootstrap.css
+  $UI_THEME = "lumen";
+  
+  // Show DKIM private keys - false by default
+--- 109,115 ----
+  
+  // default theme is lumen
+  // additional themes can be found here: https://bootswatch.com/
+! // copy them to data./css/themes/{THEME-NAME}-bootstrap.css
+  $UI_THEME = "lumen";
+  
+  // Show DKIM private keys - false by default
+diff --context --recursive --ignore-blank-lines mailcow/web/index.php mailcow-2023-01_patch_3/web/index.php
+*** mailcow/web/index.php	Wed Mar 15 14:42:14 2023
+--- mailcow-2023-01_patch_3/web/index.php	Mon Mar 20 04:38:32 2023
+***************
+*** 31,35 ****
+    'login_delay' => @$_SESSION['ldelay'],
+  ];
+  
+! $js_minifier->add('/web/js/site/index.js');
+  require_once $_SERVER['DOCUMENT_ROOT'] . '/inc/footer.inc.php';
+--- 31,35 ----
+    'login_delay' => @$_SESSION['ldelay'],
+  ];
+  
+! $js_minifier->add('./js/site/index.js');
+  require_once $_SERVER['DOCUMENT_ROOT'] . '/inc/footer.inc.php';
+diff --context --recursive --ignore-blank-lines mailcow/web/mailbox.php mailcow-2023-01_patch_3/web/mailbox.php
+*** mailcow/web/mailbox.php	Mon Mar 20 04:36:51 2023
+--- mailcow-2023-01_patch_3/web/mailbox.php	Mon Mar 20 04:38:32 2023
+***************
+*** 12,20 ****
+    include_once $_SERVER['DOCUMENT_ROOT'] . '/inc/vars.local.inc.php';
+  }
+  
+! $js_minifier->add('/web/js/site/mailbox.js');
+! $js_minifier->add('/web/js/presets/sieveMailbox.js');
+! $js_minifier->add('/web/js/site/pwgen.js');
+  
+  $role = ($_SESSION['mailcow_cc_role'] == "admin") ? 'admin' : 'domainadmin';
+  $is_dual = (!empty($_SESSION["dual-login"]["username"])) ? 'true' : 'false';
+--- 12,20 ----
+    include_once $_SERVER['DOCUMENT_ROOT'] . '/inc/vars.local.inc.php';
+  }
+  
+! $js_minifier->add('./js/site/mailbox.js');
+! $js_minifier->add('./js/presets/sieveMailbox.js');
+! $js_minifier->add('./js/site/pwgen.js');
+  
+  $role = ($_SESSION['mailcow_cc_role'] == "admin") ? 'admin' : 'domainadmin';
+  $is_dual = (!empty($_SESSION["dual-login"]["username"])) ? 'true' : 'false';
+diff --context --recursive --ignore-blank-lines mailcow/web/qhandler.php mailcow-2023-01_patch_3/web/qhandler.php
+*** mailcow/web/qhandler.php	Wed Mar 15 14:42:14 2023
+--- mailcow-2023-01_patch_3/web/qhandler.php	Mon Mar 20 04:38:32 2023
+***************
+*** 7,13 ****
+  }
+  require_once $_SERVER['DOCUMENT_ROOT'] . '/inc/header.inc.php';
+  
+! $js_minifier->add('/web/js/site/qhandler.js');
+  
+  $template = 'qhandler.twig';
+  $template_data = [
+--- 7,13 ----
+  }
+  require_once $_SERVER['DOCUMENT_ROOT'] . '/inc/header.inc.php';
+  
+! $js_minifier->add('./js/site/qhandler.js');
+  
+  $template = 'qhandler.twig';
+  $template_data = [
+diff --context --recursive --ignore-blank-lines mailcow/web/quarantine.php mailcow-2023-01_patch_3/web/quarantine.php
+*** mailcow/web/quarantine.php	Wed Mar 15 14:42:14 2023
+--- mailcow-2023-01_patch_3/web/quarantine.php	Mon Mar 20 04:38:32 2023
+***************
+*** 10,16 ****
+  $_SESSION['return_to'] = $_SERVER['REQUEST_URI'];
+  $quarantine_settings = quarantine('settings');
+  
+! $js_minifier->add('/web/js/site/quarantine.js');
+  
+  $role = ($_SESSION['mailcow_cc_role'] == "admin") ? 'admin' : 'domainadmin';
+  
+--- 10,16 ----
+  $_SESSION['return_to'] = $_SERVER['REQUEST_URI'];
+  $quarantine_settings = quarantine('settings');
+  
+! $js_minifier->add('./js/site/quarantine.js');
+  
+  $role = ($_SESSION['mailcow_cc_role'] == "admin") ? 'admin' : 'domainadmin';
+  
+diff --context --recursive --ignore-blank-lines mailcow/web/queue.php mailcow-2023-01_patch_3/web/queue.php
+*** mailcow/web/queue.php	Wed Mar 15 14:42:14 2023
+--- mailcow-2023-01_patch_3/web/queue.php	Mon Mar 20 04:38:32 2023
+***************
+*** 8,14 ****
+  
+  
+  require_once $_SERVER['DOCUMENT_ROOT'] . '/inc/header.inc.php';
+! $js_minifier->add('/web/js/site/queue.js');
+  $_SESSION['return_to'] = $_SERVER['REQUEST_URI'];
+  
+  $role = ($_SESSION['mailcow_cc_role'] == "admin") ? 'admin' : 'domainadmin';
+--- 8,14 ----
+  
+  
+  require_once $_SERVER['DOCUMENT_ROOT'] . '/inc/header.inc.php';
+! $js_minifier->add('./js/site/queue.js');
+  $_SESSION['return_to'] = $_SERVER['REQUEST_URI'];
+  
+  $role = ($_SESSION['mailcow_cc_role'] == "admin") ? 'admin' : 'domainadmin';
+diff --context --recursive --ignore-blank-lines mailcow/web/user.php mailcow-2023-01_patch_3/web/user.php
+*** mailcow/web/user.php	Wed Mar 15 14:42:14 2023
+--- mailcow-2023-01_patch_3/web/user.php	Mon Mar 20 04:38:32 2023
+***************
+*** 97,103 ****
+    exit();
+  }
+  
+! $js_minifier->add('/web/js/site/user.js');
+! $js_minifier->add('/web/js/site/pwgen.js');
+  
+  require_once $_SERVER['DOCUMENT_ROOT'] . '/inc/footer.inc.php';
+--- 97,103 ----
+    exit();
+  }
+  
+! $js_minifier->add('./js/site/user.js');
+! $js_minifier->add('./js/site/pwgen.js');
+  
+  require_once $_SERVER['DOCUMENT_ROOT'] . '/inc/footer.inc.php';

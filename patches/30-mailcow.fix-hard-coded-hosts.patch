@@ -1,0 +1,78 @@
+diff --new-file --text --recursive --unified mailcow/rspamd/local.d/greylist.conf mailcow-2023-01_patches/rspamd/local.d/greylist.conf
+--- mailcow/rspamd/local.d/greylist.conf	2023-03-15 14:42:14.836433784 +0000
++++ mailcow-2023-01_patches/rspamd/local.d/greylist.conf	2023-03-20 09:42:00.911995175 +0000
+@@ -1,4 +1,4 @@
+-whitelisted_ip = "http://nginx:8081/forwardinghosts.php";
++whitelisted_ip = "http://127.0.0.1:8081/forwardinghosts.php";
+ ipv4_mask = 24;
+ ipv6_mask = 64;
+ message = "Greylisted, please try again later";
+diff --new-file --text --recursive --unified mailcow/rspamd/local.d/metadata_exporter.conf mailcow-2023-01_patches/rspamd/local.d/metadata_exporter.conf
+--- mailcow/rspamd/local.d/metadata_exporter.conf	2023-03-15 14:42:14.836433784 +0000
++++ mailcow-2023-01_patches/rspamd/local.d/metadata_exporter.conf	2023-03-20 09:42:26.896324757 +0000
+@@ -1,20 +1,20 @@
+ rules {
+   QUARANTINE {
+     backend = "http";
+-    url = "http://nginx:9081/pipe.php";
++    url = "http://127.0.0.1:9081/pipe.php";
+     selector = "reject_no_global_bl";
+     formatter = "default";
+     meta_headers = true;
+   }
+ 	RLINFO {
+ 		backend = "http";
+-		url = "http://nginx:9081/pipe_rl.php";
++		url = "http://127.0.0.1:9081/pipe_rl.php";
+ 		selector = "ratelimited";
+ 		formatter = "json";
+ 	}
+   PUSHOVERMAIL {
+     backend = "http";
+-    url = "http://nginx:9081/pushover.php";
++    url = "http://127.0.0.1:9081/pushover.php";
+     selector = "mailcow_rcpt";
+     formatter = "json";
+     meta_headers = true;
+diff --new-file --text --recursive --unified mailcow/rspamd/lua/rspamd.local.lua mailcow-2023-01_patches/rspamd/lua/rspamd.local.lua
+--- mailcow/rspamd/lua/rspamd.local.lua	2023-03-15 14:42:14.836433784 +0000
++++ mailcow-2023-01_patches/rspamd/lua/rspamd.local.lua	2023-03-20 09:42:53.220658644 +0000
+@@ -298,7 +298,7 @@
+             else
+               rspamd_http.request({
+                 task=task,
+-                url='http://nginx:8081/aliasexp.php',
++                url='http://127.0.0.1:8081/aliasexp.php',
+                 body='',
+                 callback=http_callback,
+                 headers={Rcpt=rcpt['addr']},
+@@ -397,7 +397,7 @@
+         rspamd_logger.infox(rspamd_config, "checking bcc for rcpt address %s", e)
+         rspamd_http.request({
+           task=task,
+-          url='http://nginx:8081/bcc.php',
++          url='http://127.0.0.1:8081/bcc.php',
+           body='',
+           callback=rcpt_callback,
+           headers={Rcpt=e}
+@@ -410,7 +410,7 @@
+         rspamd_logger.infox(rspamd_config, "checking bcc for from address %s", e)
+         rspamd_http.request({
+           task=task,
+-          url='http://nginx:8081/bcc.php',
++          url='http://127.0.0.1:8081/bcc.php',
+           body='',
+           callback=from_callback,
+           headers={From=e}
+diff --new-file --text --recursive --unified mailcow/web/admin.php mailcow-2023-01_patches/web/admin.php
+--- mailcow/web/admin.php	2023-03-20 09:44:52.022285194 +0000
++++ mailcow-2023-01_patches/web/admin.php	2023-03-20 09:44:02.213599464 +0000
+@@ -99,7 +99,7 @@
+   'f2b_data' => fail2ban('get'),
+   'q_data' => quarantine('settings'),
+   'qn_data' => quota_notification('get'),
+-  'rsettings_map' => file_get_contents('http://nginx:8081/settings.php'),
++  'rsettings_map' => file_get_contents('http://127.0.0.1:8081/settings.php'),
+   'rsettings' => $rsettings,
+   'rspamd_regex_maps' => $rspamd_regex_maps,
+   'logo_specs' => customize('get', 'main_logo_specs'),

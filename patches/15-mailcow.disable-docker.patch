@@ -1,0 +1,94 @@
+diff --context --recursive --ignore-blank-lines mailcow/web/debug.php mailcow-2023-01_patch_2/web/debug.php
+*** mailcow/web/debug.php       Mon Mar 20 04:32:44 2023
+--- mailcow-2023-01_patch_2/web/debug.php       Mon Mar 20 04:34:14 2023
+***************
+*** 8,15 ****
+
+  require_once $_SERVER['DOCUMENT_ROOT'] . '/inc/header.inc.php';
+  $_SESSION['return_to'] = $_SERVER['REQUEST_URI'];
+! $solr_status = (preg_match("/^([yY][eE][sS]|[yY])+$/", $_ENV["SKIP_SOLR"])) ? false : solr_status();
+! $clamd_status = (preg_match("/^([yY][eE][sS]|[yY])+$/", $_ENV["SKIP_CLAMD"])) ? false : true;
+
+
+  if (!isset($_SESSION['gal']) && $license_cache = $redis->Get('LICENSE_STATUS_CACHE')) {
+--- 8,15 ----
+
+  require_once $_SERVER['DOCUMENT_ROOT'] . '/inc/header.inc.php';
+  $_SESSION['return_to'] = $_SERVER['REQUEST_URI'];
+! $solr_status  = false; // (preg_match("/^([yY][eE][sS]|[yY])+$/", $_ENV["SKIP_SOLR"])) ? false : solr_status();
+! $clamd_status = false; // (preg_match("/^([yY][eE][sS]|[yY])+$/", $_ENV["SKIP_CLAMD"])) ? false : true;
+
+
+  if (!isset($_SESSION['gal']) && $license_cache = $redis->Get('LICENSE_STATUS_CACHE')) {
+***************
+*** 19,24 ****
+--- 19,25 ----
+  $js_minifier->add('/web/js/site/debug.js');
+
+  // vmail df
++ /*
+  $exec_fields = array('cmd' => 'system', 'task' => 'df', 'dir' => '/var/vmail');
+  $vmail_df = explode(',', (string)json_decode(docker('post', 'dovecot-mailcow', 'exec', $exec_fields), true));
+
+***************
+*** 48,53 ****
+--- 49,57 ----
+    }
+    $containers[$container]['State']['StartedAtHR'] = $started;
+  }
++ */
++ $vmail_df = "";
++ $containers = "";
+
+  // get mailcow data
+  // $hostname = getenv('MAILCOW_HOSTNAME');
+diff --context --recursive --ignore-blank-lines mailcow/web/inc/prerequisites.inc.php mailcow-2023-01_patch_2/web/inc/prerequisites.inc.php
+*** mailcow/web/inc/prerequisites.inc.php       Mon Mar 20 04:32:44 2023
+--- mailcow-2023-01_patch_2/web/inc/prerequisites.inc.php       Mon Mar 20 04:34:52 2023
+***************
+*** 122,134 ****
+  exit;
+  }
+  // Stop when dockerapi is not available
+  if (fsockopen("tcp://dockerapi", 443, $errno, $errstr) === false) {
+  ?>
+  <center style='font-family:sans-serif;'>Connection to dockerapi container failed.<br /><br />The following error was reported:<br/><?=$errno;?> - <?=$errstr;?></center>
+  <?php
+  exit;
+  }
+!
+  // OAuth2
+  class mailcowPdo extends OAuth2\Storage\Pdo {
+    public function __construct($connection, $config = array()) {
+--- 122,135 ----
+  exit;
+  }
+  // Stop when dockerapi is not available
++ /*
+  if (fsockopen("tcp://dockerapi", 443, $errno, $errstr) === false) {
+  ?>
+  <center style='font-family:sans-serif;'>Connection to dockerapi container failed.<br /><br />The following error was reported:<br/><?=$errno;?> - <?=$errstr;?></center>
+  <?php
+  exit;
+  }
+! */
+  // OAuth2
+  class mailcowPdo extends OAuth2\Storage\Pdo {
+    public function __construct($connection, $config = array()) {
+***************
+*** 290,296 ****
+  require_once $_SERVER['DOCUMENT_ROOT'] . '/inc/functions.app_passwd.inc.php';
+  require_once $_SERVER['DOCUMENT_ROOT'] . '/inc/functions.customize.inc.php';
+  require_once $_SERVER['DOCUMENT_ROOT'] . '/inc/functions.dkim.inc.php';
+! require_once $_SERVER['DOCUMENT_ROOT'] . '/inc/functions.docker.inc.php';
+  require_once $_SERVER['DOCUMENT_ROOT'] . '/inc/functions.domain_admin.inc.php';
+  require_once $_SERVER['DOCUMENT_ROOT'] . '/inc/functions.fail2ban.inc.php';
+  require_once $_SERVER['DOCUMENT_ROOT'] . '/inc/functions.fwdhost.inc.php';
+--- 291,297 ----
+  require_once $_SERVER['DOCUMENT_ROOT'] . '/inc/functions.app_passwd.inc.php';
+  require_once $_SERVER['DOCUMENT_ROOT'] . '/inc/functions.customize.inc.php';
+  require_once $_SERVER['DOCUMENT_ROOT'] . '/inc/functions.dkim.inc.php';
+! // require_once $_SERVER['DOCUMENT_ROOT'] . '/inc/functions.docker.inc.php';
+  require_once $_SERVER['DOCUMENT_ROOT'] . '/inc/functions.domain_admin.inc.php';
+  require_once $_SERVER['DOCUMENT_ROOT'] . '/inc/functions.fail2ban.inc.php';
+  require_once $_SERVER['DOCUMENT_ROOT'] . '/inc/functions.fwdhost.inc.php';

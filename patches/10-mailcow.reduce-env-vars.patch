@@ -1,6 +1,6 @@
 diff --context --recursive --ignore-blank-lines mailcow/web/_rspamderror.php mailcow-2023-01_patch_1/web/_rspamderror.php
-*** mailcow/web/_rspamderror.php        Wed Mar 15 14:42:14 2023
---- mailcow-2023-01_patch_1/web/_rspamderror.php        Sun Mar 19 14:41:30 2023
+*** mailcow/web/_rspamderror.php	Wed Mar 15 14:42:14 2023
+--- mailcow-2023-01_patch_1/web/_rspamderror.php	Sun Mar 19 14:41:30 2023
 ***************
 *** 1,8 ****
   <?php
@@ -13,11 +13,11 @@ diff --context --recursive --ignore-blank-lines mailcow/web/_rspamderror.php mai
       $redis->connect('redis-mailcow', 6379);
 --- 1,13 ----
   <?php
-+
++ 
 + if (file_exists($_SERVER['DOCUMENT_ROOT'] . '/inc/vars.local.inc.php')) {
 +   include_once $_SERVER['DOCUMENT_ROOT'] . '/inc/vars.local.inc.php';
 + }
-+
++ 
   $redis = new Redis();
   try {
 !   if (!empty($redis_host)) {
@@ -26,12 +26,12 @@ diff --context --recursive --ignore-blank-lines mailcow/web/_rspamderror.php mai
     else {
       $redis->connect('redis-mailcow', 6379);
 diff --context --recursive --ignore-blank-lines mailcow/web/autodiscover-json.php mailcow-2023-01_patch_1/web/autodiscover-json.php
-*** mailcow/web/autodiscover-json.php   Wed Mar 15 14:42:14 2023
---- mailcow-2023-01_patch_1/web/autodiscover-json.php   Sun Mar 19 14:42:15 2023
+*** mailcow/web/autodiscover-json.php	Wed Mar 15 14:42:14 2023
+--- mailcow-2023-01_patch_1/web/autodiscover-json.php	Sun Mar 19 14:42:15 2023
 ***************
 *** 8,14 ****
   $autodiscover_config = array_merge($default_autodiscover_config, $autodiscover_config);
-
+  
   header('Content-type: application/json');
 ! if (strtolower($_GET['Protocol']) == 'activesync' && getenv('SKIP_SOGO') != "y") {
     echo '{"Protocol":"ActiveSync","Url":"' . $autodiscover_config['activesync']['url'] . '"}';
@@ -39,15 +39,15 @@ diff --context --recursive --ignore-blank-lines mailcow/web/autodiscover-json.ph
   elseif (strtolower($_GET['Protocol']) == 'autodiscoverv1') {
 --- 8,14 ----
   $autodiscover_config = array_merge($default_autodiscover_config, $autodiscover_config);
-
+  
   header('Content-type: application/json');
 ! if (strtolower($_GET['Protocol']) == 'activesync' && $skip_sogo === false) {
     echo '{"Protocol":"ActiveSync","Url":"' . $autodiscover_config['activesync']['url'] . '"}';
   }
   elseif (strtolower($_GET['Protocol']) == 'autodiscoverv1') {
 diff --context --recursive --ignore-blank-lines mailcow/web/autodiscover.php mailcow-2023-01_patch_1/web/autodiscover.php
-*** mailcow/web/autodiscover.php        Wed Mar 15 14:42:14 2023
---- mailcow-2023-01_patch_1/web/autodiscover.php        Sun Mar 19 14:48:48 2023
+*** mailcow/web/autodiscover.php	Wed Mar 15 14:42:14 2023
+--- mailcow-2023-01_patch_1/web/autodiscover.php	Sun Mar 19 14:48:48 2023
 ***************
 *** 10,17 ****
   // Redis
@@ -71,11 +71,11 @@ diff --context --recursive --ignore-blank-lines mailcow/web/autodiscover.php mai
 *** 37,48 ****
     }
   }
-
+  
 ! if (getenv('SKIP_SOGO') == "y") {
     $autodiscover_config['autodiscoverType'] = 'imap';
   }
-
+  
   //$dsn = $database_type . ":host=" . $database_host . ";dbname=" . $database_name;
 ! $dsn = $database_type . ":unix_socket=" . $database_sock . ";dbname=" . $database_name;
   $opt = [
@@ -84,11 +84,11 @@ diff --context --recursive --ignore-blank-lines mailcow/web/autodiscover.php mai
 --- 37,66 ----
     }
   }
-
+  
 ! if ($skip_sogo === true) {
     $autodiscover_config['autodiscoverType'] = 'imap';
   }
-
+  
   //$dsn = $database_type . ":host=" . $database_host . ";dbname=" . $database_name;
 ! // $dsn = $database_type . ":unix_socket=" . $database_sock . ";dbname=" . $database_name;
 ! if (isset($database_host) && isset($database_port)) {
@@ -108,7 +108,7 @@ diff --context --recursive --ignore-blank-lines mailcow/web/autodiscover.php mai
 ! <?php
 ! exit;
 ! }
-!
+! 
   $opt = [
     PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
     PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
@@ -130,16 +130,16 @@ diff --context --recursive --ignore-blank-lines mailcow/web/autodiscover.php mai
         <Protocol>
           <Type>CalDAV</Type>
 diff --context --recursive --ignore-blank-lines mailcow/web/debug.php mailcow-2023-01_patch_1/web/debug.php
-*** mailcow/web/debug.php       Wed Mar 15 14:42:14 2023
---- mailcow-2023-01_patch_1/web/debug.php       Sun Mar 19 14:40:05 2023
+*** mailcow/web/debug.php	Wed Mar 15 14:42:14 2023
+--- mailcow-2023-01_patch_1/web/debug.php	Sun Mar 19 14:40:05 2023
 ***************
 *** 50,61 ****
   }
-
+  
   // get mailcow data
 ! $hostname = getenv('MAILCOW_HOSTNAME');
   $timezone = getenv('TZ');
-
+  
   $template = 'debug.twig';
   $template_data = [
 !   'log_lines' => getenv('LOG_LINES'),
@@ -148,11 +148,11 @@ diff --context --recursive --ignore-blank-lines mailcow/web/debug.php mailcow-20
     'timezone' => $timezone,
 --- 50,61 ----
   }
-
+  
   // get mailcow data
 ! // $hostname = getenv('MAILCOW_HOSTNAME');
   $timezone = getenv('TZ');
-
+  
   $template = 'debug.twig';
   $template_data = [
 !   'log_lines' => $log_lines,
@@ -160,39 +160,39 @@ diff --context --recursive --ignore-blank-lines mailcow/web/debug.php mailcow-20
     'hostname' => $hostname,
     'timezone' => $timezone,
 diff --context --recursive --ignore-blank-lines mailcow/web/inc/ajax/dns_diagnostics.php mailcow-2023-01_patch_1/web/inc/ajax/dns_diagnostics.php
-*** mailcow/web/inc/ajax/dns_diagnostics.php    Wed Mar 15 14:42:14 2023
---- mailcow-2023-01_patch_1/web/inc/ajax/dns_diagnostics.php    Sun Mar 19 15:20:00 2023
+*** mailcow/web/inc/ajax/dns_diagnostics.php	Wed Mar 15 14:42:14 2023
+--- mailcow-2023-01_patch_1/web/inc/ajax/dns_diagnostics.php	Sun Mar 19 15:20:00 2023
 ***************
 *** 63,70 ****
-
+  
     if (!isset($autodiscover_config['sieve'])) {
       $autodiscover_config['sieve'] = array(
 !       'server' => $mailcow_hostname,
 !       'port' => array_pop(explode(':', getenv('SIEVE_PORT')))
       );
     }
-
+  
 --- 63,70 ----
-
+  
     if (!isset($autodiscover_config['sieve'])) {
       $autodiscover_config['sieve'] = array(
 !       'server' => $sieve_hostname,
 !       'port' => array_pop(explode(':', $sieve_port))
       );
     }
-
+  
 diff --context --recursive --ignore-blank-lines mailcow/web/inc/functions.fail2ban.inc.php mailcow-2023-01_patch_1/web/inc/functions.fail2ban.inc.php
-*** mailcow/web/inc/functions.fail2ban.inc.php  Wed Mar 15 14:42:14 2023
---- mailcow-2023-01_patch_1/web/inc/functions.fail2ban.inc.php  Sun Mar 19 15:27:10 2023
+*** mailcow/web/inc/functions.fail2ban.inc.php	Wed Mar 15 14:42:14 2023
+--- mailcow-2023-01_patch_1/web/inc/functions.fail2ban.inc.php	Sun Mar 19 15:27:10 2023
 ***************
 *** 1,4 ****
 --- 1,9 ----
   <?php
-+
++ 
 + if (file_exists($_SERVER['DOCUMENT_ROOT'] . '/inc/vars.local.inc.php')) {
 +   include_once $_SERVER['DOCUMENT_ROOT'] . '/inc/vars.local.inc.php';
 + }
-+
++ 
   function fail2ban($_action, $_data = null) {
     global $redis;
     $_data_log = $_data;
@@ -239,17 +239,17 @@ diff --context --recursive --ignore-blank-lines mailcow/web/inc/functions.fail2b
                   $redis->hSet('F2B_BLACKLIST', $bl_item, 1);
                 }
 diff --context --recursive --ignore-blank-lines mailcow/web/inc/functions.inc.php mailcow-2023-01_patch_1/web/inc/functions.inc.php
-*** mailcow/web/inc/functions.inc.php   Wed Mar 15 14:42:14 2023
---- mailcow-2023-01_patch_1/web/inc/functions.inc.php   Sun Mar 19 14:21:29 2023
+*** mailcow/web/inc/functions.inc.php	Wed Mar 15 14:42:14 2023
+--- mailcow-2023-01_patch_1/web/inc/functions.inc.php	Sun Mar 19 14:21:29 2023
 ***************
 *** 1,4 ****
 --- 1,9 ----
   <?php
-+
++ 
 + if (file_exists($_SERVER['DOCUMENT_ROOT'] . '/inc/vars.local.inc.php')) {
 +   include_once $_SERVER['DOCUMENT_ROOT'] . '/inc/vars.local.inc.php';
 + }
-+
++ 
   use PHPMailer\PHPMailer\PHPMailer;
   use PHPMailer\PHPMailer\SMTP;
   use PHPMailer\PHPMailer\Exception;
@@ -271,17 +271,17 @@ diff --context --recursive --ignore-blank-lines mailcow/web/inc/functions.inc.ph
     }
     global $pdo;
 diff --context --recursive --ignore-blank-lines mailcow/web/inc/functions.mailbox.inc.php mailcow-2023-01_patch_1/web/inc/functions.mailbox.inc.php
-*** mailcow/web/inc/functions.mailbox.inc.php   Wed Mar 15 14:42:14 2023
---- mailcow-2023-01_patch_1/web/inc/functions.mailbox.inc.php   Sun Mar 19 15:24:01 2023
+*** mailcow/web/inc/functions.mailbox.inc.php	Wed Mar 15 14:42:14 2023
+--- mailcow-2023-01_patch_1/web/inc/functions.mailbox.inc.php	Sun Mar 19 15:24:01 2023
 ***************
 *** 1,4 ****
 --- 1,9 ----
   <?php
-+
++ 
 + if (file_exists($_SERVER['DOCUMENT_ROOT'] . '/inc/vars.local.inc.php')) {
 +   include_once $_SERVER['DOCUMENT_ROOT'] . '/inc/vars.local.inc.php';
 + }
-+
++ 
   function mailbox($_action, $_type, $_data = null, $_extra = null) {
     global $pdo;
     global $redis;
@@ -315,7 +315,7 @@ diff --context --recursive --ignore-blank-lines mailcow/web/inc/functions.mailbo
               return false;
             }
             $mailboxdata = array();
-!           if ($mailcow_master === true)) {
+!           if ($mailcow_master === true) {
               $stmt = $pdo->prepare("SELECT
                 `domain`.`backupmx`,
                 `mailbox`.`username`,
@@ -341,24 +341,24 @@ diff --context --recursive --ignore-blank-lines mailcow/web/inc/functions.mailbo
                 curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
                 curl_setopt($curl, CURLOPT_POST, 1);
 diff --context --recursive --ignore-blank-lines mailcow/web/inc/header.inc.php mailcow-2023-01_patch_1/web/inc/header.inc.php
-*** mailcow/web/inc/header.inc.php      Wed Mar 15 14:42:14 2023
---- mailcow-2023-01_patch_1/web/inc/header.inc.php      Sun Mar 19 14:57:10 2023
+*** mailcow/web/inc/header.inc.php	Wed Mar 15 14:42:14 2023
+--- mailcow-2023-01_patch_1/web/inc/header.inc.php	Sun Mar 19 14:57:10 2023
 ***************
 *** 1,5 ****
 --- 1,9 ----
   <?php
-
+  
 + if (file_exists($_SERVER['DOCUMENT_ROOT'] . '/inc/vars.local.inc.php')) {
 +   include_once $_SERVER['DOCUMENT_ROOT'] . '/inc/vars.local.inc.php';
 + }
-+
++ 
   // CSS
   if (preg_match("/mailbox/i", $_SERVER['REQUEST_URI'])) {
     $css_minifier->add('/web/css/site/mailbox.css');
 ***************
 *** 31,49 ****
   }
-
+  
   $globalVariables = [
 !   'mailcow_hostname' => getenv('MAILCOW_HOSTNAME'),
     'mailcow_locale' => @$_SESSION['mailcow_locale'],
@@ -378,7 +378,7 @@ diff --context --recursive --ignore-blank-lines mailcow/web/inc/header.inc.php m
     'is_root_uri' => (parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH) == '/'),
 --- 35,53 ----
   }
-
+  
   $globalVariables = [
 !   'mailcow_hostname' => $mailcow_hostname,
     'mailcow_locale' => @$_SESSION['mailcow_locale'],
@@ -397,17 +397,17 @@ diff --context --recursive --ignore-blank-lines mailcow/web/inc/header.inc.php m
     'app_links' => customize('get', 'app_links'),
     'is_root_uri' => (parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH) == '/'),
 diff --context --recursive --ignore-blank-lines mailcow/web/inc/init_db.inc.php mailcow-2023-01_patch_1/web/inc/init_db.inc.php
-*** mailcow/web/inc/init_db.inc.php     Wed Mar 15 14:42:14 2023
---- mailcow-2023-01_patch_1/web/inc/init_db.inc.php     Sun Mar 19 14:28:14 2023
+*** mailcow/web/inc/init_db.inc.php	Wed Mar 15 14:42:14 2023
+--- mailcow-2023-01_patch_1/web/inc/init_db.inc.php	Sun Mar 19 14:28:14 2023
 ***************
 *** 1,4 ****
 --- 1,9 ----
   <?php
-+
++ 
 + if (file_exists($_SERVER['DOCUMENT_ROOT'] . '/inc/vars.local.inc.php')) {
 +   include_once $_SERVER['DOCUMENT_ROOT'] . '/inc/vars.local.inc.php';
 + }
-+
++ 
   function init_db_schema() {
     try {
       global $pdo;
@@ -424,17 +424,17 @@ diff --context --recursive --ignore-blank-lines mailcow/web/inc/init_db.inc.php 
         if ($stmt->fetch(PDO::FETCH_ASSOC)['version'] == $db_version) {
           return true;
         }
-!       if (!$mailcow_master === true)) {
+!       if (!$mailcow_master === true) {
           $_SESSION['return'][] = array(
             'type' => 'warning',
             'log' => array(__FUNCTION__),
 diff --context --recursive --ignore-blank-lines mailcow/web/inc/prerequisites.inc.php mailcow-2023-01_patch_1/web/inc/prerequisites.inc.php
-*** mailcow/web/inc/prerequisites.inc.php       Wed Mar 15 14:42:14 2023
---- mailcow-2023-01_patch_1/web/inc/prerequisites.inc.php       Sun Mar 19 15:32:44 2023
+*** mailcow/web/inc/prerequisites.inc.php	Wed Mar 15 14:42:14 2023
+--- mailcow-2023-01_patch_1/web/inc/prerequisites.inc.php	Sun Mar 19 15:32:44 2023
 ***************
 *** 6,12 ****
   $DEMO_MODE = (getenv('DEMO_MODE') == 'y');
-
+  
   // Slave does not serve UI
 ! /* if (!preg_match('/y|yes/i', getenv('MASTER'))) {
     header('Location: /SOGo', true, 307);
@@ -442,7 +442,7 @@ diff --context --recursive --ignore-blank-lines mailcow/web/inc/prerequisites.in
   }*/
 --- 6,12 ----
   $DEMO_MODE = (getenv('DEMO_MODE') == 'y');
-
+  
   // Slave does not serve UI
 ! /* if (!$mailcow_master === true) {
     header('Location: /SOGo', true, 307);
@@ -454,7 +454,7 @@ diff --context --recursive --ignore-blank-lines mailcow/web/inc/prerequisites.in
   $WebAuthn = new lbuchs\WebAuthn\WebAuthn('WebAuthn Library', $server_name, $formats);
   // only include root ca's when needed
 ! if (getenv('WEBAUTHN_ONLY_TRUSTED_VENDORS') == 'y') $WebAuthn->addRootCertificates($_SERVER['DOCUMENT_ROOT'] . '/inc/lib/WebAuthn/rootCertificates');
-
+  
   // Redis
   $redis = new Redis();
   try {
@@ -468,7 +468,7 @@ diff --context --recursive --ignore-blank-lines mailcow/web/inc/prerequisites.in
   $WebAuthn = new lbuchs\WebAuthn\WebAuthn('WebAuthn Library', $server_name, $formats);
   // only include root ca's when needed
 ! if ($webauth_only_trusted_vendors === true) $WebAuthn->addRootCertificates($_SERVER['DOCUMENT_ROOT'] . '/inc/lib/WebAuthn/rootCertificates');
-
+  
   // Redis
   $redis = new Redis();
   try {
@@ -481,7 +481,7 @@ diff --context --recursive --ignore-blank-lines mailcow/web/inc/prerequisites.in
 *** 86,92 ****
   // $mins -= $hrs * 60;
   // $offset = sprintf('%+d:%02d', $hrs*$sgn, $mins);
-
+  
 ! $dsn = $database_type . ":unix_socket=" . $database_sock . ";dbname=" . $database_name;
   $opt = [
     PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
@@ -489,7 +489,7 @@ diff --context --recursive --ignore-blank-lines mailcow/web/inc/prerequisites.in
 --- 86,110 ----
   // $mins -= $hrs * 60;
   // $offset = sprintf('%+d:%02d', $hrs*$sgn, $mins);
-
+  
 ! // $dsn = $database_type . ":unix_socket=" . $database_sock . ";dbname=" . $database_name;
 ! if (isset($database_host) && isset($database_port)) {
 !   $dsn = $database_type . ":host=" . $database_host . ";port=3306;dbname=" . $database_name;
@@ -508,7 +508,7 @@ diff --context --recursive --ignore-blank-lines mailcow/web/inc/prerequisites.in
 ! <?php
 ! exit;
 ! }
-!
+! 
   $opt = [
     PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
     PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
@@ -517,7 +517,7 @@ diff --context --recursive --ignore-blank-lines mailcow/web/inc/prerequisites.in
   if (file_exists('/web/css/themes/'.$UI_THEME.'-bootstrap.css'))
     $css_minifier->add('/web/css/themes/'.$UI_THEME.'-bootstrap.css');
   else
-!   $css_minifier->add('/web/css/themes/lumen-bootstrap.css');
+!   $css_minifier->add('/web/css/themes/lumen-bootstrap.css'); 
   // minify css build files
   foreach ($css_dir as $css_file) {
     $css_minifier->add('/web/css/build/' . $css_file);
@@ -529,83 +529,9 @@ diff --context --recursive --ignore-blank-lines mailcow/web/inc/prerequisites.in
   // minify css build files
   foreach ($css_dir as $css_file) {
     $css_minifier->add('/web/css/build/' . $css_file);
-diff --context --recursive --ignore-blank-lines mailcow/web/inc/vars.local.inc.php mailcow-2023-01_patch_1/web/inc/vars.local.inc.php
-*** mailcow/web/inc/vars.local.inc.php  Sun Mar 19 15:32:17 2023
---- mailcow-2023-01_patch_1/web/inc/vars.local.inc.php  Sun Mar 19 12:15:52 2023
-***************
-*** 1,25 ****
-  <?php
-  // Ansible managed: Do NOT edit this file manually!
-
-- /*
-- require_once $_SERVER['DOCUMENT_ROOT'] . '/inc/vars.inc.php';
--
-- $default_autodiscover_config = $autodiscover_config;
--
-- if (file_exists($_SERVER['DOCUMENT_ROOT'] . '/inc/vars.local.inc.php')) {
--   include_once $_SERVER['DOCUMENT_ROOT'] . '/inc/vars.local.inc.php';
-- }
-- */
--
-- // -> require_once $_SERVER['DOCUMENT_ROOT'] . '/inc/prerequisites.inc.php';
--
-  // error_reporting(E_ERROR);
-  error_reporting(E_ALL);
-
-- $mailcow_hostname     = "mailcow.internal";
-- $default_pass_scheme  = "SSHA";
--
--
-  // footer information
-  $mailcow_version_tag  = "2023-01";
-  $mailcow_last_git_version = "2023-01";
---- 1,9 ----
-***************
-*** 39,78 ****
-  $redis_host = "redis";
-  $redis_port = "6379";
-
-- $sieve_hostname = "127.0.0.1";
-- $sieve_port = "4190";
--
-  // support docker?
-  $support_docker = false;
-
-- // Skip SOGo
-- // Will disable SOGo integration and therefore webmail, DAV protocols and ActiveSync support
-- // (experimental, unsupported, not fully implemented)
-- $skip_sogo = true;                      // getenv('SKIP_SOGO'))
--
-- // Skip Solr on low-memory systems or if you do not want to store a readable index of
-- // your mails in solr-vol-1.
-- $skip_solr = true;                      // getenv('SKIP_SOLR')
--
-- $solr_hostname = "127.0.0.1";
-- $solr_port = 8983;
--
-- $mailcow_master = true;                 // getenv('MASTER')
--
-- $webauth_only_trusted_vendors = true;   // getenv('WEBAUTHN_ONLY_TRUSTED_VENDORS') == 'y')
--
-- // Allow admins to log into SOGo as email user (without any password)
-- $allow_admin_email_login      = false;  // getenv('ALLOW_ADMIN_EMAIL_LOGIN')
--
-- // Max log lines per service to keep in Redis logs
-- $log_lines  = 9999;                     // getenv('LOG_LINES')
--
-- # Internal IPv4 /24 subnet, format n.n.n (expands to n.n.n.0/24)
-- # Use private IPv4 addresses only, see https://en.wikipedia.org/wiki/Private_network#Private_IPv4_addresses
-- $ipv4_network = "172.22.1";             // IPV4_NETWORK
--
-- # Internal IPv6 subnet in fc00::/7
-- # Use private IPv6 addresses only, see https://en.wikipedia.org/wiki/Private_network#Private_IPv6_addresses
-- $ipv6_network = fd4d:6169:6c63:6f77::/64  // IPV6_NETWORK
--
--
---- 23,28 ----
 diff --context --recursive --ignore-blank-lines mailcow/web/json_api.php mailcow-2023-01_patch_1/web/json_api.php
-*** mailcow/web/json_api.php    Wed Mar 15 14:42:14 2023
---- mailcow-2023-01_patch_1/web/json_api.php    Sun Mar 19 15:16:35 2023
+*** mailcow/web/json_api.php	Wed Mar 15 14:42:14 2023
+--- mailcow-2023-01_patch_1/web/json_api.php	Sun Mar 19 15:16:35 2023
 ***************
 *** 1533,1539 ****
                     $solr_status = solr_status();
@@ -628,7 +554,7 @@ diff --context --recursive --ignore-blank-lines mailcow/web/json_api.php mailcow
                       'solr_size' => $solr_size,
                       'solr_documents' => $solr_documents
                     ));
-!                 break;
+!                 break;  
                   case "host":
                     if (!$extra){
                       $stats = docker("host_stats");
@@ -642,75 +568,75 @@ diff --context --recursive --ignore-blank-lines mailcow/web/json_api.php mailcow
                       $stats = docker("host_stats");
 ***************
 *** 1553,1559 ****
-                    }
+                    } 
                     else if ($extra == "ip") {
                       // get public ips
--
+-                     
                       $curl = curl_init();
                       curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
                       curl_setopt($curl, CURLOPT_POST, 0);
 --- 1553,1558 ----
 diff --context --recursive --ignore-blank-lines mailcow/web/mailbox.php mailcow-2023-01_patch_1/web/mailbox.php
-*** mailcow/web/mailbox.php     Wed Mar 15 14:42:14 2023
---- mailcow-2023-01_patch_1/web/mailbox.php     Sun Mar 19 14:59:02 2023
+*** mailcow/web/mailbox.php	Wed Mar 15 14:42:14 2023
+--- mailcow-2023-01_patch_1/web/mailbox.php	Sun Mar 19 14:59:02 2023
 ***************
 *** 8,14 ****
   require_once $_SERVER['DOCUMENT_ROOT'] .  '/inc/header.inc.php';
   $_SESSION['return_to'] = $_SERVER['REQUEST_URI'];
-
-!
-
+  
+! 
+  
   $js_minifier->add('/web/js/site/mailbox.js');
   $js_minifier->add('/web/js/presets/sieveMailbox.js');
 --- 8,16 ----
   require_once $_SERVER['DOCUMENT_ROOT'] .  '/inc/header.inc.php';
   $_SESSION['return_to'] = $_SERVER['REQUEST_URI'];
-
+  
 ! if (file_exists($_SERVER['DOCUMENT_ROOT'] . '/inc/vars.local.inc.php')) {
 !   include_once $_SERVER['DOCUMENT_ROOT'] . '/inc/vars.local.inc.php';
 ! }
-
+  
   $js_minifier->add('/web/js/site/mailbox.js');
   $js_minifier->add('/web/js/presets/sieveMailbox.js');
 ***************
 *** 16,22 ****
-
+  
   $role = ($_SESSION['mailcow_cc_role'] == "admin") ? 'admin' : 'domainadmin';
   $is_dual = (!empty($_SESSION["dual-login"]["username"])) ? 'true' : 'false';
 ! $allow_admin_email_login = (preg_match("/^([yY][eE][sS]|[yY])+$/", $_ENV["ALLOW_ADMIN_EMAIL_LOGIN"])) ? 'true' : 'false';
-
+  
   // domains
   $domains = mailbox('get', 'domains');
 --- 18,25 ----
-
+  
   $role = ($_SESSION['mailcow_cc_role'] == "admin") ? 'admin' : 'domainadmin';
   $is_dual = (!empty($_SESSION["dual-login"]["username"])) ? 'true' : 'false';
 ! //  moved to vars.local.inc.php
 ! // $allow_admin_email_login = (preg_match("/^([yY][eE][sS]|[yY])+$/", $_ENV["ALLOW_ADMIN_EMAIL_LOGIN"])) ? 'true' : 'false';
-
+  
   // domains
   $domains = mailbox('get', 'domains');
 diff --context --recursive --ignore-blank-lines mailcow/web/sogo-auth.php mailcow-2023-01_patch_1/web/sogo-auth.php
-*** mailcow/web/sogo-auth.php   Wed Mar 15 14:42:14 2023
---- mailcow-2023-01_patch_1/web/sogo-auth.php   Sun Mar 19 15:03:07 2023
+*** mailcow/web/sogo-auth.php	Wed Mar 15 14:42:14 2023
+--- mailcow-2023-01_patch_1/web/sogo-auth.php	Sun Mar 19 15:03:07 2023
 ***************
 *** 1,9 ****
   <?php
-
+  
 ! $ALLOW_ADMIN_EMAIL_LOGIN = (preg_match(
     "/^([yY][eE][sS]|[yY])+$/",
     $_ENV["ALLOW_ADMIN_EMAIL_LOGIN"]
   ));
-
+  
   $session_var_user_allowed = 'sogo-sso-user-allowed';
   $session_var_pass = 'sogo-sso-pass';
 --- 1,17 ----
   <?php
-
+  
 ! if (file_exists($_SERVER['DOCUMENT_ROOT'] . '/inc/vars.local.inc.php')) {
 !   include_once $_SERVER['DOCUMENT_ROOT'] . '/inc/vars.local.inc.php';
 ! }
-!
+! 
 ! // moved to vars.local.inc.php
 ! /*$ALLOW_ADMIN_EMAIL_LOGIN = (preg_match(
     "/^([yY][eE][sS]|[yY])+$/",
@@ -718,8 +644,8 @@ diff --context --recursive --ignore-blank-lines mailcow/web/sogo-auth.php mailco
   ));
 + */
 + $ALLOW_ADMIN_EMAIL_LOGIN = $allow_admin_email_login;
-+
-
++ 
+  
   $session_var_user_allowed = 'sogo-sso-user-allowed';
   $session_var_pass = 'sogo-sso-pass';
 ***************
